@@ -8,6 +8,7 @@
 \usepackage{enumerate}
 \usepackage{xcolor}
 \usepackage{hyperref}
+\usepackage{soul}
 \usepackage{tabu} %for longtabu
 \usepackage{hhline} %for double \hline in longtabu
 \usepackage{listings}
@@ -30,7 +31,7 @@
 	\HRule\\[1.5cm]
 	\vfill\vfill\vfill
 	{\large\today}
-	\vfill 
+	\vfill
 \end{titlepage}
 
 \begin{titlepage}
@@ -44,11 +45,12 @@
 	%\HRule\\[1.5cm]
 %	\vfill\vfill\vfill
 %	{\large\today}
-%	\vfill 
+%	\vfill
 \end{titlepage}
 
 \section{Brief Setup Process}
 This section talks about how to generate required files and steps to run the demo. \\
+Demo project location: R2U2/R2U2-HW/demo\\
 Note: 1) The text mark with \colorbox{blue!30}{\hspace{0.5cm}} means the command typed in terminal.\\
 2) The text marked in \textcolor{green!100}{green} are the files that require manually modify.
 \subsection{Preprocessing}
@@ -59,14 +61,15 @@ Note: 1) The text mark with \colorbox{blue!30}{\hspace{0.5cm}} means the command
 		\item Generate \textcolor{purple!30}{at\_checkers.vhd} and \textcolor{purple!30}{log\_input\_pkg.vhd} by running \colorbox{blue!30}{python transformer.py}
 		\item Write atomic assertion configuration in \textcolor{green!100}{input.ast} (section \ref{input.ast}), run \colorbox{blue!30}{python assert\_convert.py} to convert the assertion into binary configuration file named \textcolor{purple!30}{res.atc}.
 	\end{enumerate}
-\item Generate binary instruction assembly code and its interval file (.imem and .int)
+\item Generate binary instruction assembly code and its interval file (.ftasm, .imem and .int)
 	\begin{enumerate}
-		\item write assembly code in \textcolor{green!100}{casestudy.ftasm}, run \colorbox{blue!30}{sh convert.sh} in folder
+		\item \st{write assembly code in} \textcolor{green!100}{\st{casestudy.ftasm}}\st{, run} \colorbox{blue!30}{\st{sh convert.sh}}\st{ in scripts folder}
+		\item write high level MTL in \textcolor{green!100}{casestudy.txt}, run \colorbox{blue!30}{sh rawConvert.sh} in scripts folder
 	\end{enumerate}
 \item Generate UART byte data
 	\begin{enumerate}
-		\item Modify parameters associated with data byte size in \textcolor{green!100}{python gen\_uart\_data.py} (section \ref{gendata.py}). These parameters should be the same as \textcolor{purple!30}{R2U2\_pkg.vhd}. Run command \colorbox{blue!30}{python gen\_uart\_data.py}
-	\end{enumerate}	
+		\item Modify parameters associated with data byte size in \textcolor{green!100}{gen\_uart\_data.py} (section \ref{gendata.py}). These parameters should be the same as \textcolor{purple!30}{R2U2\_pkg.vhd}. Run command \colorbox{blue!30}{python gen\_uart\_data.py}
+	\end{enumerate}
 \end{enumerate}
 
 \subsection{Hardware Connection}
@@ -106,6 +109,26 @@ Note: 1) The text mark with \colorbox{blue!30}{\hspace{0.5cm}} means the command
 
 \clearpage
 
+\subsection{Workflow}
+\begin{figure}[h]
+\caption{Demo Workflow}
+\label{workflow}
+\includegraphics[width=15cm]{./fig/r2u2_process.eps}
+\centering
+\end{figure}
+
+\clearpage
+
+\subsection{Design Structure}
+\begin{figure}[h]
+\caption{Structure of R2U2 Hardware Component}
+\label{workflow}
+\includegraphics[width=16cm]{./fig/project_structure.png}
+\centering
+\end{figure}
+
+\clearpage
+
 
 
 
@@ -131,15 +154,15 @@ class Gs111m(CsvParser):
 Comment: Create a subclass. It will subtract the data you mentioned in \textbf{self.addConfig} and output the processed data into \textbf{self.file}
 The self.file will look like:
 \begin{center}
-\begin{tabular}{ c|c} 
+\begin{tabular}{ c|c}
  \hline
- roll\_angle & pitch\_angle \\ 
+ roll\_angle & pitch\_angle \\
  \hline
- -42 & 12 \\ 
+ -42 & 12 \\
  \hline
- -34 & 6\\ 
+ -34 & 6\\
  \hline
- -25 & 3\\ 
+ -25 & 3\\
  ...&...
 \end{tabular}
 \end{center}
@@ -194,7 +217,7 @@ Each line specifies the configuration for one atomic checker block. Consider the
 \subsection{gen\_uart\_data.py}\label{gendata.py}
 Generate uart data byte by byte. Requires \textbf{.atc}, \textbf{.imem}, \textbf{.int} and \textbf{.dat} as input. I suggest leave the \textbf{.dat} file empty for the demo purpose.\\
 %\begin{enumerate}
-%	\item 
+%	\item
 %	\item class subclass(CsvParser): \\
 %\end{enumerate}
 Parameters:\\
@@ -202,9 +225,9 @@ Parameters:\\
 @ SETUP\_ADDR\_WIDTH\_extend\_byte: \textbf{.atc} file configuration address width.\\
 @ DATA\_BYTE\_WIDTH\_extend\_byte: binary logged data bit width (each line width of \textcolor{purple!30}{logged\_data.dat}).\\
 These three parameters should be the same as in \textcolor{purple!30}{R2U2\_pkg.vhd}.
- 
+
  \subsection{ser.py}\label{ser.py}
- 
+
  \begin{enumerate}
  	\item serial.Serial()\\
 	e.g.
@@ -223,7 +246,7 @@ Comment: By default, it is 9600 baud rate 8IN1 mode. You only need to specify th
 	\item parameters:
 	@ DATA\_BYTE\_WIDTH\_extend\_byte: (same as \textcolor{purple!30}{gen\_uart\_data.py})
   \end{enumerate}
- 
+
 
  \section{Demo Screenshot}
  Suppose all data is preprocessed properly. How are the screenshot sample:\\
@@ -244,5 +267,5 @@ Comment: By default, it is 9600 baud rate 8IN1 mode. You only need to specify th
 \end{figure}
 The future time monitor output is shown in Figure \ref{step2}.\\
 
-You can keep feeding sensor input and see output in each time step. 
+You can keep feeding sensor input and see output in each time step.
 \end{document}
